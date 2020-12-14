@@ -1,23 +1,20 @@
 package init.mg.app.controller
 
-import com.google.gson.FieldNamingPolicy
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigRenderOptions
-import init.mg.app.helper.ConfigFile
-import init.mg.app.helper.ObjectUtil
-import init.mg.app.payload.app.AppSetting
-import init.mg.app.payload.app.RequestCreateAppSetting
+import init.mg.app.payload.*
+import init.mg.app.payload.app.RequestUpdateAppSetting
 import init.mg.app.payload.enum.MobileOs
-import init.mg.app.payload.project.ProjectInfo
 import init.mg.app.service.AppService
-import init.mg.app.service.ProjectService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.InvalidMediaTypeException
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.io.File
+import java.io.FileNotFoundException
 import java.util.*
-
+import javax.validation.Valid;
 
 @RestController
 class AppController : CommonController<Any>() {
@@ -27,15 +24,25 @@ class AppController : CommonController<Any>() {
 
 
     @GetMapping("/api/app/setting/{project-id}")
-    fun getApp(@PathVariable("project-id") projectId : String ,
-                @RequestParam(value ="os" , required = true) os : MobileOs
-    ) : ResponseEntity<Any>? {
-        ConfigFactory.invalidateCaches();
-        val appSetting : Config = appService.getConfig(projectId,os)
-        return ok(appSetting.root().render(ConfigRenderOptions.concise()));
+    @Throws(Exception::class)
+    fun getApp(@PathVariable("project-id") projectId: String,
+               @RequestParam(value = "os", required = true) os: MobileOs
+    ) : ResponseEntity<*>? {
+
+            ConfigFactory.invalidateCaches();
+            val appSetting : Config = appService.getConfig(projectId, os)
+            return ok(appSetting.root().render(ConfigRenderOptions.concise()));
+
     }
 
 
+    @Throws(Exception::class)
+    @PutMapping("/api/app/setting/{project-id}")
+    fun getApp(@PathVariable("project-id") projectId: String,
+              @Valid @RequestBody os: RequestUpdateAppSetting): Unit {
+        println("im wokring ")
+            appService.putConfig(projectId, os)
 
+    }
 
 }
