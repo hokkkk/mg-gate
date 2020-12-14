@@ -9,7 +9,7 @@ class ConfigFile {
     companion object {
         var PARENT_PATH : String;
         var CONF_FILE_PARENT_PATH : String;
-        var PROJECT_INFO : String =  "project-info.conf";
+        var PROJECT_INFO : String =  "application-info.conf";
         init {
 
             var parent : String = File(System.getProperty("config.file")).parent;
