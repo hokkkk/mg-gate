@@ -9,11 +9,13 @@ class ConfigFile {
 
     companion object {
         var PARENT_PATH : String;
+        var CONF_FILE_PARENT_PATH : String;
         var PROJECT_INFO : String =  "project-info.conf";
         init {
 
             var parent : String = File(System.getProperty("config.file")).parent;
             PARENT_PATH = parent
+            CONF_FILE_PARENT_PATH = "$parent/app-settings"
         }
 
         inline fun <reified T> load (configName : String) : T {
