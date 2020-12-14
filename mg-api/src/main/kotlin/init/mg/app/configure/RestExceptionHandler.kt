@@ -2,9 +2,7 @@ package init.mg.app.configure
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import init.mg.app.exception.ApiError
-import init.mg.app.exception.ApiResponse
 import init.mg.app.exception.BusinessException
-
 import org.springframework.beans.TypeMismatchException
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -73,15 +71,19 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         return ResponseEntity(apiError, HttpHeaders(), apiError.status)
     }
 
-    @ExceptionHandler(value = [MissingKotlinParameterException::class,ConstraintViolationException::class])
+    @ExceptionHandler(value = [MissingKotlinParameterException::class, ConstraintViolationException::class])
     fun handleConstraintViolation(ex: ConstraintViolationException, request: WebRequest): ResponseEntity<Any> {
         val errors = mutableListOf<String>()
-        println("im wokring 2")
         ex.constraintViolations.forEach { errors.add("$it.rootBeanClass.name $it.propertyPath: $it.message") }
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, errors)
         return ResponseEntity(apiError, HttpHeaders(), apiError.status)
     }
-
+//    @ExceptionHandler(DataIntegrityViolationException::class)
+//    protected fun handleDataIntegrityViolation(ex: DataIntegrityViolationException, request: WebRequest?): ResponseEntity<Any?>? {
+//        return if (ex.getCause() is ConstraintViolationException) {
+//            buildResponseEntity(ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()))
+//        } else buildResponseEntity(ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex))
+//    }
     override fun handleNoHandlerFoundException(ex: NoHandlerFoundException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.NOT_FOUND, ex.localizedMessage, "No handler found for " + ex.httpMethod + " " + ex.requestURL)
         return ResponseEntity(apiError, HttpHeaders(), apiError.status)
@@ -123,6 +125,6 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
     }
 
     fun buildResponseEntity(apiError: ApiError): ResponseEntity<Any?>? {
-        return ResponseEntity(apiError,apiError.status)
+        return ResponseEntity(apiError, apiError.status)
     }
 }

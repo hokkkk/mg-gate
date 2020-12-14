@@ -4,6 +4,7 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigRenderOptions
 import init.mg.app.payload.*
+import init.mg.app.payload.app.PlatformDetail
 import init.mg.app.payload.app.RequestUpdateAppSetting
 import init.mg.app.payload.enum.MobileOs
 import init.mg.app.service.AppService
@@ -38,10 +39,11 @@ class AppController : CommonController<Any>() {
 
     @Throws(Exception::class)
     @PutMapping("/api/app/setting/{project-id}")
-    fun getApp(@PathVariable("project-id") projectId: String,
-              @Valid @RequestBody os: RequestUpdateAppSetting): Unit {
-        println("im wokring ")
-            appService.putConfig(projectId, os)
+    fun putApp(   @PathVariable("project-id") projectId: String,
+                 @RequestParam("os", required = true) os : MobileOs,
+              @Valid @RequestBody platformDetail : PlatformDetail): Unit {
+
+            appService.putConfig(projectId, RequestUpdateAppSetting(os,platformDetail))
 
     }
 

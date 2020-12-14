@@ -40,6 +40,8 @@ dependencies {
 	compile("io.springfox:springfox-swagger-ui:2.7.0")
 	implementation ("com.google.code.gson:gson:2.8.5")
 	compile("javax.validation:validation-api:2.0.1.Final")
+	compile("org.springframework:spring-aspects:3.2.4.RELEASE")
+
 
 }
 
