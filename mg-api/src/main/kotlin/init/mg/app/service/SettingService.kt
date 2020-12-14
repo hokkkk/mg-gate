@@ -12,21 +12,33 @@ import init.mg.app.payload.setting.AppSetting
 import init.mg.app.payload.setting.RequestCreateAppSetting
 import init.mg.app.payload.setting.RequestUpdateAppSetting
 import init.mg.app.payload.enum.MobileOs
+import init.mg.app.payload.setting.PlatformDetail
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
+import javax.servlet.http.HttpServletRequest
 
 
 @Service
 class SettingService {
+    @Autowired
+    lateinit var request: HttpServletRequest;
 
     @Throws(Exception::class)
-    fun getConfig(appId: String, os: MobileOs) : Config {
+    fun getConfig(appId: String, os: MobileOs) : String {
 
       try{
-          var parent :  String = ConfigFile.CONF_FILE_PARENT_PATH
-          val appSetting : Config  =  ConfigFactory.parseFile(File(parent, "$appId.conf"))
-          return appSetting.getConfig(os.value);
+
+          val config : Config  =  ConfigFactory.parseFile(File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf"))
+          val responseStr = config.getConfig(os.value).root().render(ConfigRenderOptions.concise())
+
+          if(!"km".equals(request.locale.toLanguageTag()) )   return responseStr;
+
+          val platformDetail : PlatformDetail? = PlatformDetail.getDetail(responseStr)
+          platformDetail?.switchToKm();
+          return platformDetail.toString();
       }catch (ex : Throwable){
+          ex.printStackTrace()
           throw BusinessException(ErrorCode.FILE_NOT_FOUND)
       }
     }
@@ -44,7 +56,9 @@ class SettingService {
 
     @Throws(Exception::class)
     fun putConfig(appId: String, reqAppSetting: RequestUpdateAppSetting) : Unit {
+
         ConfigFactory.invalidateCaches();
+
         var targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
         var config = ConfigFactory.parseFile(targetFile);
         var appSetting = AppSetting.getAppSetting(config.root().render(ConfigRenderOptions.concise()))
@@ -54,8 +68,10 @@ class SettingService {
                 appSetting.ios = reqAppSetting.platformDetail;
             else
                 appSetting.aos = reqAppSetting.platformDetail;
+
             FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gson.toJson(appSetting))
         } else {
+
             throw BusinessException(ErrorCode.FILE_NOT_FOUND)
         }
 

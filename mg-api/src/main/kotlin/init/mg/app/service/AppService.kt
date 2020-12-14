@@ -22,18 +22,18 @@ class AppService {
     }
 
     @Throws(Exception::class)
-    fun createProject(appName : String , appSetting : RequestCreateAppSetting) : Info {
+    fun createApplication(appName : String , appSetting : RequestCreateAppSetting) : Info {
         var info  = Info();
         val appId = UUID.randomUUID().toString();
 
         info.appName = appName;
         info.appId = appService.createConfig(appId,appSetting)
 
-        createNewProject(info)
+        createNewApplication(info)
         return info;
     }
 
-    fun createNewProject(info : Info) : Info? {
+    fun createNewApplication(info : Info) : Info? {
         var appInfo  =  loadApp();
         println(info)
         appInfo?.info?.add(info);

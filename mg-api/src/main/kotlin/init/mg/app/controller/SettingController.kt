@@ -23,11 +23,11 @@ class SettingController : CommonController<Any>() {
     @Throws(Exception::class)
     fun getApp(@PathVariable("app_id") appId: String,
                @RequestParam(value = "os", required = true) os: MobileOs
-    ) : ResponseEntity<*>? {
+    ) : ResponseEntity<String>? {
 
             ConfigFactory.invalidateCaches();
-            val appSetting : Config = settingService.getConfig(appId, os)
-            return ok(appSetting.root().render(ConfigRenderOptions.concise()));
+
+            return  ok(settingService.getConfig(appId, os));
 
     }
 

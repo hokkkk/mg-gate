@@ -21,7 +21,7 @@ class AppController : CommonController<Any>(){
             @PathVariable("app-name") pName : String ,
             @RequestBody appSetting : RequestCreateAppSetting
     ) : ResponseEntity<Any>? {
-        return ok(appService.createProject(pName,appSetting))
+        return ok(appService.createApplication(pName,appSetting))
 
     }
 }

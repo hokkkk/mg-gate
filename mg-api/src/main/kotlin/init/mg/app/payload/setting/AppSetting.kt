@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.google.gson.annotations.SerializedName
 import init.mg.app.helper.ObjectUtil
+import init.mg.app.payload.CommonPayload
 import lombok.Getter
 import lombok.Setter
 import lombok.ToString
@@ -11,7 +12,7 @@ import lombok.ToString
 @ToString
 @Getter
 @Setter
-open class AppSetting {
+open class AppSetting :  CommonPayload() {
 
     @SerializedName("IOS")
     @JsonProperty("IOS")
@@ -21,9 +22,6 @@ open class AppSetting {
     @JsonProperty("AOS")
     public var aos : PlatformDetail = PlatformDetail();
 
-    constructor()  {
-
-    }
 
     companion object {
 
@@ -33,9 +31,4 @@ open class AppSetting {
     }
 
 
-
-
-    override fun toString(): String {
-        return ObjectUtil.writeValueAsString(this)
-    }
 }
