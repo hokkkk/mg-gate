@@ -1,8 +1,8 @@
-package init.mg.app.payload.project
+package init.mg.app.payload.app
 
 //import java.util.ArrayList
 import kotlin.collections.ArrayList
 
-class ProjectInfo {
+class AppInfo {
     var info : MutableList<Info> = ArrayList()
 }

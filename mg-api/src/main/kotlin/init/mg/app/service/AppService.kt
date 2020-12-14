@@ -1,65 +1,48 @@
 package init.mg.app.service
 
-import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
-import com.typesafe.config.ConfigRenderOptions
-import init.mg.app.exception.BusinessException
 import init.mg.app.helper.ConfigFile
 import init.mg.app.helper.FileUtil
 import init.mg.app.helper.ObjectUtil
-import init.mg.app.payload.*
-import init.mg.app.payload.app.AppSetting
-import init.mg.app.payload.app.RequestCreateAppSetting
-import init.mg.app.payload.app.RequestUpdateAppSetting
-import init.mg.app.payload.enum.MobileOs
+import init.mg.app.payload.setting.RequestCreateAppSetting
+import init.mg.app.payload.app.Info
+import init.mg.app.payload.app.AppInfo
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
-import java.io.FileNotFoundException
-
-
+import java.util.*
+import kotlin.Throws
 
 @Service
 class AppService {
+    @Autowired
+    lateinit var appService : SettingService;
+    open fun loadApp() : AppInfo? {
 
-    @Throws(Exception::class)
-    fun getConfig(appId: String, os: MobileOs) : Config {
-
-      try{
-          var parent :  String = ConfigFile.CONF_FILE_PARENT_PATH
-          val appSetting : Config  =  ConfigFactory.parseFile(File(parent, "$appId.conf"))
-          return appSetting.getConfig(os.value);
-      }catch (ex : Throwable){
-          throw BusinessException(ErrorCode.FILE_NOT_FOUND)
-      }
+        return ConfigFile.load<AppInfo>("project");
     }
 
     @Throws(Exception::class)
-    fun createConfig(appId: String, appSetting: RequestCreateAppSetting) : String  {
-        ConfigFactory.invalidateCaches();
+    fun createProject(appName : String , appSetting : RequestCreateAppSetting) : Info {
+        var info  = Info();
+        val appId = UUID.randomUUID().toString();
 
-        val targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
-        FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gson.toJson(appSetting))
+        info.appName = appName;
+        info.appId = appService.createConfig(appId,appSetting)
 
-        return appId;
-
+        createNewProject(info)
+        return info;
     }
 
-    @Throws(Exception::class)
-    fun putConfig(appId: String, reqAppSetting: RequestUpdateAppSetting) : Unit {
-        ConfigFactory.invalidateCaches();
-        var targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
-        var config = ConfigFactory.parseFile(targetFile);
-        var appSetting = AppSetting.getAppSetting(config.root().render(ConfigRenderOptions.concise()))
+    fun createNewProject(info : Info) : Info? {
+        var appInfo  =  loadApp();
+        println(info)
+        appInfo?.info?.add(info);
+        val targetFile = File(ConfigFile.PARENT_PATH, ConfigFile.PROJECT_INFO);
 
-        if (appSetting != null) {
-            if (MobileOs.IOS.equals(reqAppSetting.os))
-                appSetting.ios = reqAppSetting.platformDetail;
-            else
-                appSetting.aos = reqAppSetting.platformDetail;
-            FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gson.toJson(appSetting))
-        } else {
-            throw BusinessException(ErrorCode.FILE_NOT_FOUND)
-        }
+        FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gsonCamel.toJson(appInfo))
 
+        return info;
     }
+
+
 }

@@ -2,7 +2,6 @@ package init.mg.app.helper
 
 import com.typesafe.config.ConfigBeanFactory
 import com.typesafe.config.ConfigFactory
-import init.mg.app.payload.project.ProjectInfo
 import java.io.File
 
 class ConfigFile {

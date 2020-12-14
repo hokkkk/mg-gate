@@ -41,6 +41,8 @@ dependencies {
 	implementation ("com.google.code.gson:gson:2.8.5")
 	compile("javax.validation:validation-api:2.0.1.Final")
 	compile("org.springframework:spring-aspects:3.2.4.RELEASE")
+//	compile ("log4j:log4j:1.2.17")
+	compile ("org.slf4j:slf4j-api:1.7.30")
 
 
 }

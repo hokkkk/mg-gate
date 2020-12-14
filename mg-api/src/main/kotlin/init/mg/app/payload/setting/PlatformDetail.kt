@@ -1,10 +1,9 @@
-package init.mg.app.payload.app
+package init.mg.app.payload.setting
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.gson.annotations.SerializedName
 import lombok.Getter
 import lombok.Setter
-import lombok.ToString
 import java.util.*
 
 //@ToString

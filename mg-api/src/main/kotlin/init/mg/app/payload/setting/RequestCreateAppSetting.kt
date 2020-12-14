@@ -1,4 +1,4 @@
-package init.mg.app.payload.app
+package init.mg.app.payload.setting
 
 import lombok.Getter
 import lombok.Setter

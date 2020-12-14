@@ -1,4 +1,4 @@
-package init.mg.app.payload.app
+package init.mg.app.payload.setting
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
