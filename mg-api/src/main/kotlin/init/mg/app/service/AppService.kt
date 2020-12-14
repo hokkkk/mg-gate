@@ -22,11 +22,11 @@ import java.io.FileNotFoundException
 class AppService {
 
     @Throws(Exception::class)
-    fun getConfig(projectId: String, os: MobileOs) : Config {
+    fun getConfig(appId: String, os: MobileOs) : Config {
 
       try{
           var parent :  String = ConfigFile.CONF_FILE_PARENT_PATH
-          val appSetting : Config  =  ConfigFactory.parseFile(File(parent, "$projectId.conf"))
+          val appSetting : Config  =  ConfigFactory.parseFile(File(parent, "$appId.conf"))
           return appSetting.getConfig(os.value);
       }catch (ex : Throwable){
           throw BusinessException(ErrorCode.FILE_NOT_FOUND)
@@ -34,20 +34,20 @@ class AppService {
     }
 
     @Throws(Exception::class)
-    fun createConfig(projectId: String, appSetting: RequestCreateAppSetting) : String  {
+    fun createConfig(appId: String, appSetting: RequestCreateAppSetting) : String  {
         ConfigFactory.invalidateCaches();
 
-        val targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$projectId.conf")
+        val targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
         FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gson.toJson(appSetting))
 
-        return projectId;
+        return appId;
 
     }
 
     @Throws(Exception::class)
-    fun putConfig(projectId: String, reqAppSetting: RequestUpdateAppSetting) : Unit {
+    fun putConfig(appId: String, reqAppSetting: RequestUpdateAppSetting) : Unit {
         ConfigFactory.invalidateCaches();
-        var targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$projectId.conf")
+        var targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
         var config = ConfigFactory.parseFile(targetFile);
         var appSetting = AppSetting.getAppSetting(config.root().render(ConfigRenderOptions.concise()))
 

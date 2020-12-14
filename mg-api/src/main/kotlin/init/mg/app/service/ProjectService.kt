@@ -28,12 +28,12 @@ class ProjectService {
     }
 
     @Throws(Exception::class)
-    fun createProject(projectName : String , appSetting : RequestCreateAppSetting) : Info {
+    fun createProject(appName : String , appSetting : RequestCreateAppSetting) : Info {
         var info  = Info();
-        val projectId = UUID.randomUUID().toString();
+        val appId = UUID.randomUUID().toString();
 
-        info.projectName = projectName;
-        info.projectId = appService.createConfig(projectId,appSetting)
+        info.projectName = appName;
+        info.projectId = appService.createConfig(appId,appSetting)
 
         createNewProject(info)
         return info;

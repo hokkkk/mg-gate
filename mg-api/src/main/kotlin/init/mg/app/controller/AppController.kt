@@ -24,26 +24,26 @@ class AppController : CommonController<Any>() {
     private lateinit var appService : AppService;
 
 
-    @GetMapping("/api/app/setting/{project-id}")
+    @GetMapping("/api/app/setting/{app_id}")
     @Throws(Exception::class)
-    fun getApp(@PathVariable("project-id") projectId: String,
+    fun getApp(@PathVariable("app_id") appId: String,
                @RequestParam(value = "os", required = true) os: MobileOs
     ) : ResponseEntity<*>? {
 
             ConfigFactory.invalidateCaches();
-            val appSetting : Config = appService.getConfig(projectId, os)
+            val appSetting : Config = appService.getConfig(appId, os)
             return ok(appSetting.root().render(ConfigRenderOptions.concise()));
 
     }
 
 
     @Throws(Exception::class)
-    @PutMapping("/api/app/setting/{project-id}")
-    fun putApp(   @PathVariable("project-id") projectId: String,
+    @PutMapping("/api/app/setting/{app_id}")
+    fun putApp(   @PathVariable("app_id") appId: String,
                  @RequestParam("os", required = true) os : MobileOs,
               @Valid @RequestBody platformDetail : PlatformDetail): Unit {
 
-            appService.putConfig(projectId, RequestUpdateAppSetting(os,platformDetail))
+            appService.putConfig(appId, RequestUpdateAppSetting(os,platformDetail))
 
     }
 

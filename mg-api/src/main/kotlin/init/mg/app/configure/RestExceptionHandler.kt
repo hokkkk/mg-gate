@@ -2,6 +2,7 @@ package init.mg.app.configure
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import init.mg.app.exception.ApiError
+import init.mg.app.exception.ApiResponse
 import init.mg.app.exception.BusinessException
 import org.springframework.beans.TypeMismatchException
 import org.springframework.core.Ordered
@@ -31,7 +32,7 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
 
     override fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(status, "Something went wrong with your request.", emptyList(), ex.localizedMessage)
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     override fun handleMethodArgumentNotValid(ex: MethodArgumentNotValidException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
@@ -39,7 +40,7 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         ex.bindingResult.fieldErrors.forEach { errors.add("${it.field}: ${it.defaultMessage}") }
         ex.bindingResult.globalErrors.forEach { errors.add("${it.objectName}: ${it.defaultMessage}") }
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, errors)
-        return handleExceptionInternal(ex, apiError, headers, apiError.status, request)
+        return handleExceptionInternal(ex, apiError, headers, apiError.code, request)
     }
 
     override fun handleBindException(ex: BindException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
@@ -47,28 +48,28 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         ex.bindingResult.fieldErrors.forEach { errors.add("${it.field}: ${it.defaultMessage}") }
         ex.bindingResult.globalErrors.forEach { errors.add("${it.objectName}: ${it.defaultMessage}") }
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, errors)
-        return handleExceptionInternal(ex, apiError, headers, apiError.status, request)
+        return handleExceptionInternal(ex, apiError, headers, apiError.code, request)
     }
 
     override fun handleTypeMismatch(ex: TypeMismatchException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, "${ex.value} value for ${ex.propertyName} should be of type ${ex.requiredType}")
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     override fun handleMissingServletRequestPart(ex: MissingServletRequestPartException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, ex.requestPartName + " part is missing")
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     override fun handleMissingServletRequestParameter(ex: MissingServletRequestParameterException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, ex.parameterName + " parameter is missing")
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleMethodArgumentTypeMismatch(ex: MethodArgumentTypeMismatchException, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, ex.name + " should be of type " + ex.requiredType!!.name)
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     @ExceptionHandler(value = [MissingKotlinParameterException::class, ConstraintViolationException::class])
@@ -76,7 +77,7 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         val errors = mutableListOf<String>()
         ex.constraintViolations.forEach { errors.add("$it.rootBeanClass.name $it.propertyPath: $it.message") }
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, errors)
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 //    @ExceptionHandler(DataIntegrityViolationException::class)
 //    protected fun handleDataIntegrityViolation(ex: DataIntegrityViolationException, request: WebRequest?): ResponseEntity<Any?>? {
@@ -86,7 +87,7 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
 //    }
     override fun handleNoHandlerFoundException(ex: NoHandlerFoundException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.NOT_FOUND, ex.localizedMessage, "No handler found for " + ex.httpMethod + " " + ex.requestURL)
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     override fun handleHttpRequestMethodNotSupported(ex: HttpRequestMethodNotSupportedException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
@@ -95,7 +96,7 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         builder.append(" method is not supported for this request. Supported methods are ")
         ex.supportedHttpMethods!!.forEach { t -> builder.append(t.toString() + " ") }
         val apiError = ApiError(HttpStatus.METHOD_NOT_ALLOWED, ex.localizedMessage, builder.toString())
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     override fun handleHttpMediaTypeNotSupported(ex: HttpMediaTypeNotSupportedException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
@@ -104,13 +105,13 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         builder.append(" media type is not supported. Supported media types are ")
         ex.supportedMediaTypes.forEach { t -> builder.append(t.toString() + " ") }
         val apiError = ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.localizedMessage, builder.substring(0, builder.length - 2))
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     @ExceptionHandler(Exception::class)
     fun handleAll(ex: Exception, request: WebRequest): ResponseEntity<Any> {
         val apiError = ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage, "error occurred")
-        return ResponseEntity(apiError, HttpHeaders(), apiError.status)
+        return ResponseEntity(apiError, HttpHeaders(), apiError.code)
     }
 
     @ExceptionHandler(BusinessException::class)
@@ -119,12 +120,12 @@ class RestExceptionHandler : ResponseEntityExceptionHandler(){
         val errorCode = ex.getErrorCode()
         val errorMessage = errorCode.message
         val apiError = ApiError(errorCode.status, errorCode.toString())
-        apiError.clientMessage =  errorCode.message
-        apiError.developerMessage = ex.stackTraceToString();
+        apiError.message =  errorCode.message
+        apiError.debugMessage = ex.stackTraceToString();
         return buildResponseEntity(apiError)
     }
 
     fun buildResponseEntity(apiError: ApiError): ResponseEntity<Any?>? {
-        return ResponseEntity(apiError, apiError.status)
+        return ResponseEntity(ApiResponse(apiError), apiError.code)
     }
 }

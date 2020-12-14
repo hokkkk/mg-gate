@@ -12,14 +12,14 @@ class ProjectController : CommonController<Any>(){
     @Autowired
     private lateinit  var projectService : ProjectService
 
-    @GetMapping("/api/projects")
+    @GetMapping("/api/app")
     fun getProjectInfo() : Any? {
         return projectService.loadProject();
     }
 
-    @PostMapping( "/api/projects/{project-name}")
+    @PostMapping( "/api/app/{app-name}")
     fun createApp(
-            @PathVariable("project-name") pName : String ,
+            @PathVariable("app-name") pName : String ,
             @RequestBody appSetting : RequestCreateAppSetting
     ) : ResponseEntity<Any>? {
         return ok(projectService.createProject(pName,appSetting))
