@@ -1,10 +1,12 @@
 package init.mg.app.controller
 
+import init.mg.app.payload.setting.AppDynasmicSetting
 import init.mg.app.payload.setting.RequestCreateAppSetting
 import init.mg.app.service.AppService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 class AppController : CommonController<Any>(){
@@ -24,4 +26,14 @@ class AppController : CommonController<Any>(){
         return ok(appService.createApplication(pName,appSetting))
 
     }
+
+    @PostMapping("/api/v1/app/{app-name}")
+    fun createApp(
+            @PathVariable("app-name") pName : String ,
+            @Valid @RequestBody appSetting : AppDynasmicSetting
+    ) : ResponseEntity<Any>? {
+//        return ok(appService.createApplication(pName,appSetting))
+        return ok(appService.createApplicationDynasmicFeild(pName,appSetting));
+    }
+
 }

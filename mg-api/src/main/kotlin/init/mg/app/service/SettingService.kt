@@ -8,11 +8,8 @@ import init.mg.app.helper.ConfigFile
 import init.mg.app.helper.FileUtil
 import init.mg.app.helper.ObjectUtil
 import init.mg.app.payload.*
-import init.mg.app.payload.setting.AppSetting
-import init.mg.app.payload.setting.RequestCreateAppSetting
-import init.mg.app.payload.setting.RequestUpdateAppSetting
 import init.mg.app.payload.enum.MobileOs
-import init.mg.app.payload.setting.PlatformDetail
+import init.mg.app.payload.setting.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
@@ -44,7 +41,30 @@ class SettingService {
     }
 
     @Throws(Exception::class)
+    fun getRawConfig(appId: String, os: MobileOs) : String {
+        try{
+            val config : Config  =  ConfigFactory.parseFile(File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf"));
+            return config.getConfig(os.value).root().render(ConfigRenderOptions.concise());
+        }catch (ex : Throwable){
+            ex.printStackTrace();
+            throw BusinessException(ErrorCode.FILE_NOT_FOUND);
+        }
+    }
+
+
+    @Throws(Exception::class)
     fun createConfig(appId: String, appSetting: RequestCreateAppSetting) : String  {
+        ConfigFactory.invalidateCaches();
+
+        val targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
+        FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gson.toJson(appSetting))
+
+        return appId;
+
+    }
+
+    @Throws(Exception::class)
+    fun createConfig(appId: String, appSetting: AppDynasmicSetting) : String  {
         ConfigFactory.invalidateCaches();
 
         val targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")

@@ -30,6 +30,17 @@ class SettingController : CommonController<Any>() {
             return  ok(settingService.getConfig(appId, os));
 
     }
+    @GetMapping("/api/v1/app/setting/{app_id}")
+    @Throws(Exception::class)
+    fun getRawApp(@PathVariable("app_id") appId: String,
+               @RequestParam(value = "os", required = true) os: MobileOs
+    ) : ResponseEntity<String>? {
+
+        ConfigFactory.invalidateCaches();
+
+        return  ok(settingService.getRawConfig(appId, os));
+
+    }
 
 
     @Throws(Exception::class)

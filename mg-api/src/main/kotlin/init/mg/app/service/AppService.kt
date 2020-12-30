@@ -6,11 +6,13 @@ import init.mg.app.helper.ObjectUtil
 import init.mg.app.payload.setting.RequestCreateAppSetting
 import init.mg.app.payload.app.Info
 import init.mg.app.payload.app.AppInfo
+import init.mg.app.payload.setting.AppDynasmicSetting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
 import java.util.*
 import kotlin.Throws
+import kotlin.collections.HashMap
 
 @Service
 class AppService {
@@ -44,5 +46,15 @@ class AppService {
         return info;
     }
 
+    @Throws(Exception::class)
+    fun createApplicationDynasmicFeild(appName : String ,reqBody : AppDynasmicSetting) : Any {
+        var info  = Info();
+        var appId = UUID.randomUUID().toString();
+        info.appName = appName;
+        info.appId = appService.createConfig(appId ,reqBody)
 
+        createNewApplication(info)
+
+        return info;
+    }
 }
