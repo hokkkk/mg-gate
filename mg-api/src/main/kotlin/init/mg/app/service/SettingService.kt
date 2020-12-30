@@ -96,4 +96,27 @@ class SettingService {
         }
 
     }
+
+    @Throws(Exception::class)
+    fun putConfig(appId: String, reqAppSetting: RequestUpdateAppDeynasmicSetting) : Unit {
+
+        ConfigFactory.invalidateCaches();
+
+        var targetFile = File(ConfigFile.CONF_FILE_PARENT_PATH, "$appId.conf")
+        var config = ConfigFactory.parseFile(targetFile);
+        var appSetting = AppDynasmicSetting.getAppSetting(config.root().render(ConfigRenderOptions.concise()))
+
+        if (appSetting != null) {
+            if (MobileOs.IOS.equals(reqAppSetting.os))
+                appSetting.ios = reqAppSetting.hashMap;
+            else
+                appSetting.aos = reqAppSetting.hashMap;
+
+            FileUtil.saveToTypeSafe(targetFile, ObjectUtil.gson.toJson(appSetting))
+        } else {
+
+            throw BusinessException(ErrorCode.FILE_NOT_FOUND)
+        }
+
+    }
 }

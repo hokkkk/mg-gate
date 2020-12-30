@@ -6,6 +6,7 @@ import com.typesafe.config.ConfigRenderOptions
 import init.mg.app.payload.setting.PlatformDetail
 import init.mg.app.payload.setting.RequestUpdateAppSetting
 import init.mg.app.payload.enum.MobileOs
+import init.mg.app.payload.setting.RequestUpdateAppDeynasmicSetting
 import init.mg.app.service.SettingService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -50,6 +51,16 @@ class SettingController : CommonController<Any>() {
               @Valid @RequestBody platformDetail : PlatformDetail): Unit {
 
             settingService.putConfig(appId, RequestUpdateAppSetting(os,platformDetail))
+
+    }
+
+    @Throws(Exception::class)
+    @PutMapping("/api/v1/app/setting/{app_id}")
+    fun putRawApp(   @PathVariable("app_id") appId: String,
+                  @RequestParam("os", required = true) os : MobileOs,
+                  @Valid @RequestBody hashMap : HashMap<String,Object>): Unit {
+
+        settingService.putConfig(appId, RequestUpdateAppDeynasmicSetting(os,hashMap))
 
     }
 
